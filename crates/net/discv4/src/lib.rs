@@ -60,7 +60,7 @@ use std::{
 use tokio::{
     net::UdpSocket,
     sync::{mpsc, mpsc::error::TrySendError, oneshot, oneshot::Sender as OneshotSender},
-    task::{JoinHandle, JoinSet},
+    task::{yield_now, JoinHandle, JoinSet},
     time::Interval,
 };
 use tokio_stream::{wrappers::ReceiverStream, Stream, StreamExt};
@@ -1751,10 +1751,12 @@ pub(crate) async fn receive_loop(udp: Arc<UdpSocket>, tx: IngressSender, local_i
                             continue
                         }
                         send(IngressEvent::Packet(remote_addr, packet)).await;
+                        yield_now().await;
                     }
                     Err(err) => {
                         debug!( target : "discv4",  ?err,"Failed to decode packet");
-                        send(IngressEvent::BadPacket(remote_addr, err, packet.to_vec())).await
+                        send(IngressEvent::BadPacket(remote_addr, err, packet.to_vec())).await;
+                        yield_now().await;
                     }
                 }
             }
