@@ -217,6 +217,7 @@ impl PeersManager {
         if !self.connection_info.has_in_capacity() {
             return Err(InboundConnectionError::ExceedsLimit(self.connection_info.max_inbound))
         }
+        trace!("incrementing conn for addr: {}", addr.to_string());
         // keep track of new connection
         self.connection_info.inc_in();
         Ok(())
@@ -815,6 +816,11 @@ impl ConnectionInfo {
 
     ///  Returns `true` if there's still capacity for a new incoming connection.
     fn has_in_capacity(&self) -> bool {
+        trace!(
+            "logging capacity here - curr is: {}, max is: {}",
+            self.num_inbound,
+            self.max_inbound
+        );
         self.num_inbound < self.max_inbound
     }
 

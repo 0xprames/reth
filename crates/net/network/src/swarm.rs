@@ -219,7 +219,7 @@ where
                     }
                     return None
                 }
-
+                trace!(target: "net", ?remote_addr, "Headed into on_incoming");
                 match self.sessions.on_incoming(stream, remote_addr) {
                     Ok(session_id) => {
                         trace!(target: "net", ?remote_addr, "Incoming connection");
